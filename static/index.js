@@ -1,22 +1,25 @@
 const codeReader = new ZXing.BrowserQRCodeReader();
-
 let chosenDeviceId = null;
+let puzzleId = null;
+let cards = [];
 
 function getQRContent(video_id, callback) {
   codeReader.listVideoInputDevices().then(devices => {
     const deviceId = devices[0].deviceId;
-    codeReader.decodeFromInputVideoDevice(deviceId, video_id)
-              .then(result => {
-                console.log('QR Content: ' + result.text)
-                codeReader.reset();   
-                callback(result.text);
-              })
-              .catch(err => console.error(err));
+    codeReader.decodeFromInputVideoDeviceContinuously(deviceId, video_id, (result, err) => {
+      if (result) {
+        console.log('QR Content: ' + result.text)
+        // codeReader.reset();
+        callback(result.text);
+      } else if (err) {
+        // error
+      }
     });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  getQRContent('video2', cb);
+  getQRContent("video", cb);
 });
 
 function cb(text) {
